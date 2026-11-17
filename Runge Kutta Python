@@ -150,3 +150,28 @@ plt.legend()
 plt.grid()
 
 plt.show()
+
+# Making the data table
+p, v, t = trajectory_sphere(
+    p0=(0, 0),
+    v0=(10, 10),
+    mass=3,
+    radius=0.5,
+    h=0.01
+)
+
+p = np.array(p)
+v = np.array(v)
+t = np.array(t)
+
+
+df = pd.DataFrame({
+    "Time (s)": t,
+    "X Position (m)": p[:, 0],
+    "Y Position (m)": p[:, 1],
+    "X Velocity (m/s)": v[:, 0],
+    "Y Velocity (m/s)": v[:, 1]
+})
+
+# Display table
+print(df)
