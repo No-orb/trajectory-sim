@@ -14,18 +14,24 @@ cd_plate = 1.28
 cd_half_sphere = .42
 
 def calculate_drag_force(v_x, v_y, rho, A_front, A_bottom, Cdf, Cdb):
+    #Calculates the speed vector magnitude
     v_mag = math.hypot(v_x, v_y)
 
+    #Avoids division by zero if the objecft is no longer moving
     if v_mag == 0:
         return 0.0, 0.0
 
+    #Calculates the direction cosines to scale the front and bottom areas
     cos = abs(v_x) / v_mag
     sin = abs(v_y) / v_mag
 
+    #Calculates the effective drag area
     CdA = (Cdf * A_front * cos) + (Cdb * A_bottom * sin)
 
+    #Calculates the magnitude of the total drag force
     F_drag = .5 * rho * CdA * (v_mag ** 2)
 
+    #Projects the total drag force onto the x and y axis and reverses the direction
     F_drag_x = -F_drag * (v_x / v_mag)
     F_drag_y = -F_drag * (v_y / v_mag)
 
@@ -62,15 +68,18 @@ def estimate_cd(profile, length, area):
     Estimates the drag coefficient of a given profile based on its shape and area
     """
 
+    #Take 200 evenly spaced points as samples along length and finds peak half-width
     x_values = np.linspace(0, length, 200)
     max_y = max(abs(profile(x_values)))
-    max_thickness = 2 * max_y
+    max_thickness = 2 * max_y #Profile is symmetric about the centerline
 
+    #Gives minimum Cd if the profile is completely flat
     if max_thickness == 0:
         return .05
-    
+
+    #Computes bounding rectangle area enclosing full profile
     bound_area = length * max_thickness
-    fullness = area / bound_area
+    fullness = area / bound_area #Measures the bluntness / bloxiness of the shpae
     thickness_ratio = max_thickness / length
 
     cd_est = .15 + (.75 * fullness) + (.2 * min(thickness_ratio, 1))
